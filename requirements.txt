@@ -1,3 +1,9 @@
 huggingface_hub
 datasets
-PIL
+numpy
+torch
+torch.utils.data
+torchvision
+scikit-learn
+torchvision
+matplotlib.pyplot
