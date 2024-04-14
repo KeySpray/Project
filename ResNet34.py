@@ -25,7 +25,7 @@ criterion = nn.CrossEntropyLoss().to(device)
 optimizer = torch.optim.Adam(rn.parameters(), lr=0.001)
 
 
-num_epochs = 20  # Set the number of epochs
+num_epochs = 150  # Set the number of epochs
 
 training_losses = []
 accuracies = []
@@ -70,6 +70,9 @@ for epoch in range(num_epochs):
         accuracy = 100 * correct / total
         accuracies.append(accuracy)
         print(f'Validation Accuracy: {100 * correct / total:.2f}%')
+    if epoch_loss < 0.005:
+        torch.save(rn.state_dict(), 'resnet34_weights.pth')
+        break
 
 def plot_training_loss(training_losses):
     plt.figure(figsize=(10, 5))
