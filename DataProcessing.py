@@ -60,6 +60,7 @@ for i, example in enumerate(train_dataset):
 # Flatten and normalize the pixels between [0, 1]
 for i, example in enumerate(test_dataset):
     X_test_lr[i] = np.array(example["image"]).flatten() / 255.0
+print(np.sum(x == 1 for x in Y_test_lr))
 # print(max(X_test_lr[0]))
 # print(Y_test_lr[0])
 

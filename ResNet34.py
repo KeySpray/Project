@@ -95,14 +95,14 @@ def validate(rn, val_loop):
             _, predicted = torch.max(outputs.data, dim=1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-            all_probs.append(probs.cpu().numpy())
+            all_probs.append(predicted.cpu().numpy())
             all_labels.append(labels.cpu().numpy())
 
-        accuracy = accuracy_score(np.concatenate(all_labels), np.concatenate(all_probs).argmax(axis=1))
-        precision = precision_score(np.concatenate(all_labels), np.concatenate(all_probs).argmax(axis=1), average='weighted')
-        recall = recall_score(np.concatenate(all_labels), np.concatenate(all_probs).argmax(axis=1), average='weighted')
-        f1 = f1_score(np.concatenate(all_labels), np.concatenate(all_probs).argmax(axis=1), average='weighted')
-        cm = confusion_matrix(np.concatenate(all_labels), np.concatenate(all_probs).argmax(axis=1))
+        accuracy = accuracy_score(np.concatenate(all_labels), np.concatenate(all_probs))
+        precision = precision_score(np.concatenate(all_labels), np.concatenate(all_probs), average='micro')
+        recall = recall_score(np.concatenate(all_labels), np.concatenate(all_probs), average='micro')
+        f1 = f1_score(np.concatenate(all_labels), np.concatenate(all_probs), average='micro')
+        cm = confusion_matrix(np.concatenate(all_labels), np.concatenate(all_probs))
         
         print(f'Validation Accuracy: {accuracy:.3f}%')
         print(f'Precision: {precision:.3f}')
@@ -186,12 +186,12 @@ num_classes = 4
 
 ############
 
-# Create pretrained ResNet model, fine-tune on our dataset
-rn_pretrained = create_resnet(True, ResNet34_Weights, num_classes)
-# Train and validate will save model weights
-weight_label = 'resnet34_weights_pretrained.pth'
-training_losses_pretrained, accuracies_pretrained = train_and_validate(rn_pretrained, num_epochs, weight_label)
-plot_loss_and_accuracy(training_losses_pretrained, accuracies_pretrained, 'Pretrained')
+# # Create pretrained ResNet model, fine-tune on our dataset
+# rn_pretrained = create_resnet(True, ResNet34_Weights, num_classes)
+# # Train and validate will save model weights
+# weight_label = 'resnet34_weights_pretrained.pth'
+# training_losses_pretrained, accuracies_pretrained = train_and_validate(rn_pretrained, num_epochs, weight_label)
+# plot_loss_and_accuracy(training_losses_pretrained, accuracies_pretrained, 'Pretrained')
 
 
 
@@ -204,12 +204,12 @@ plot_loss_and_accuracy(training_losses_pretrained, accuracies_pretrained, 'Pretr
 
 ############
 
-# Create untrained ResNet model, train on our dataset
-rn_untrained = create_resnet(False, None, num_classes)
-# Train and validate will save model weights
-weight_label = 'resnet34_weights_untrained.pth'
-training_losses_untrained, accuracies_untrained = train_and_validate(rn_untrained, num_epochs, weight_label)
-plot_loss_and_accuracy(training_losses_untrained, accuracies_untrained, 'Untrained')
+# # Create untrained ResNet model, train on our dataset
+# rn_untrained = create_resnet(False, None, num_classes)
+# # Train and validate will save model weights
+# weight_label = 'resnet34_weights_untrained.pth'
+# training_losses_untrained, accuracies_untrained = train_and_validate(rn_untrained, num_epochs, weight_label)
+# plot_loss_and_accuracy(training_losses_untrained, accuracies_untrained, 'Untrained')
 
 # Load pretrained, fine-tuned ResNet model with saved weights
 rn_pretrained = create_resnet(False, 'resnet34_weights_pretrained.pth', num_classes)
@@ -221,7 +221,7 @@ accuracy_pretrained, precision_pretrained, recall_pretrained, f1_pretrained, cm_
 plot_precision_recall_f1(rn_pretrained, val_loop, 'Pretrained')
 
 # Load previously untrained ResNet model with saved weights
-rn_pretrained = create_resnet(False, 'resnet34_weights_untrained.pth', num_classes)
+rn_untrained = create_resnet(False, 'resnet34_weights_untrained.pth', num_classes)
 # Create validation tqdm loop with test dataset
 val_loop = tqdm(test_loader_nn)
 # Validate test dataset, printing and returning various metrics
