@@ -144,44 +144,16 @@ def plot_loss_and_accuracy(training_losses, accuracies, label):
     plt.title(f'Training Loss and Accuracy vs. Epoch - {label}')
     plt.savefig(f'Training_Loss_Accuracy_vs_Epoch_{label}')
 
-
-def plot_precision_recall_f1(rn, val_loader, label):
-    all_preds = []
-    all_labels = []
-    for images, labels in val_loader:
-        images, labels = images.to(device), labels.to(device)
-        outputs = rn(images)
-        _, predicted = torch.max(outputs.data, 1)
-        all_preds.extend(predicted.cpu().numpy())
-        all_labels.extend(labels.cpu().numpy())
-    
-    precision, recall, f1, _ = precision_recall_fscore_support(all_labels, all_preds, average=None)
-
-    fig, ax = plt.subplots()
-    ax.bar(range(len(precision)), precision, label='Precision')
-    ax.bar(range(len(recall)), recall, label='Recall')
-    ax.bar(range(len(f1)), f1, label='F1-score')
-    ax.set_xticks(range(len(precision)))
-    ax.set_xticklabels(classes, rotation=45)
-    ax.set_xlabel('Classes')
-    ax.set_ylabel('Score')
-    ax.set_title('Precision, Recall, and F1-score by Class - ' + label)
-    ax.legend()
-    plt.savefig(f'Precision_Recall_F1_{label}.png')
-
-
-
-
+# Problem Specific Code
 
 num_epochs = 150  # Set the number of epochs
-
 classes = {'Mild Demented', 'Moderate Demented', 'Non Demented', 'Very Mild Demented'}
 num_classes = 4
 
 ############
 
 
-# Section of code to create pretrained resnet model, fine-tune, and validate with saved weights after fine-tuning
+# Section of code to create models and train
 
 
 ############
@@ -193,17 +165,6 @@ num_classes = 4
 # training_losses_pretrained, accuracies_pretrained = train_and_validate(rn_pretrained, num_epochs, weight_label)
 # plot_loss_and_accuracy(training_losses_pretrained, accuracies_pretrained, 'Pretrained')
 
-
-
-
-############
-
-
-# Section of code to create untrained resnet model, train, and validate with saved weights after training
-
-
-############
-
 # # Create untrained ResNet model, train on our dataset
 # rn_untrained = create_resnet(False, None, num_classes)
 # # Train and validate will save model weights
@@ -211,14 +172,24 @@ num_classes = 4
 # training_losses_untrained, accuracies_untrained = train_and_validate(rn_untrained, num_epochs, weight_label)
 # plot_loss_and_accuracy(training_losses_untrained, accuracies_untrained, 'Untrained')
 
+
+
+
+############
+
+
+# Section of code to create models with saved weights and validate
+
+
+############
+
 # Load pretrained, fine-tuned ResNet model with saved weights
 rn_pretrained = create_resnet(False, 'resnet34_weights_pretrained.pth', num_classes)
 # Create validation tqdm loop with test dataset
 val_loop = tqdm(test_loader_nn)
 # Validate test dataset, printing and returning various metrics
 accuracy_pretrained, precision_pretrained, recall_pretrained, f1_pretrained, cm_pretrained = validate(rn_pretrained, val_loop)
-# Plot Precision, Recall, and F1-score by Class for pretrained model
-plot_precision_recall_f1(rn_pretrained, val_loop, 'Pretrained')
+
 
 # Load previously untrained ResNet model with saved weights
 rn_untrained = create_resnet(False, 'resnet34_weights_untrained.pth', num_classes)
@@ -226,8 +197,6 @@ rn_untrained = create_resnet(False, 'resnet34_weights_untrained.pth', num_classe
 val_loop = tqdm(test_loader_nn)
 # Validate test dataset, printing and returning various metrics
 accuracy_untrained, precision_untrained, recall_untrained, f1_untrained, cm_untrained = validate(rn_untrained, val_loop)
-# Plot Precision, Recall, and F1-score by Class for untrained model
-plot_precision_recall_f1(rn_untrained, val_loop, 'Untrained')
 
 
 # # Print model parameters
